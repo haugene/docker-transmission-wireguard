@@ -29,9 +29,16 @@ echo "Gateway: $GW"
 echo "Interface address: $INT_IP"
 echo "Interface broadcast: $INT_BRD"
 
-# Override DNS to Cloudflare
+# Override DNS to Cloudflare unless SKIP_DNS_OVERRIDE is set to true (case insensitive)
+if [ -z "${SKIP_DNS_OVERRIDE}" ] || ! [[ "${SKIP_DNS_OVERRIDE,,}" == "true" ]]; then
+  echo "Overriding DNS to Cloudflare"
+  echo "nameserver 1.1.1.1" > /etc/resolv.conf
+else
+  echo "Skipping DNS override due to SKIP_DNS_OVERRIDE=${SKIP_DNS_OVERRIDE}"
+fi
+
+echo "DNS config:"
 cat /etc/resolv.conf
-echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
 # Create a "physical" network namespace and move our eth0 there
 ip netns ls
