@@ -7,7 +7,7 @@
     "alt-speed-time-end": 1020,
     "alt-speed-up": 50,
     "bind-address-ipv4": "0.0.0.0",
-    "bind-address-ipv6": "::",
+    "bind-address-ipv6": "",
     "blocklist-enabled": false,
     "blocklist-url": "http://www.example.com/blocklist",
     "cache-size-mb": 4,

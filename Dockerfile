@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
     tzdata dnsutils iputils-ping ufw iproute2 \
     openssh-client git jq curl wget unrar unzip bc \
     # New for this image
-    wireguard nginx \
+    wireguard nginx iptables \
     # End new for this image
     && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && useradd -u 911 -U -d /config -s /bin/false abc \
