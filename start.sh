@@ -21,7 +21,7 @@ fi
 GW=$(/sbin/ip route list match 0.0.0.0 | awk '{print $3}')
 INT=$(/sbin/ip route list match 0.0.0.0 | awk '{print $5}')
 INT_IP=$(ip -f inet addr show "$INT" | awk '/inet / {print $2}')
-INT_BRD=$(ip -f inet addr show "$INT" | awk '/inet / {print $4}')
+INT_BRD=$(ip -f inet addr show "$INT" | awk '/inet / {if ($3 == "brd") print $4}')
 
 echo "Found default container interface, will use this in setup:"
 echo "Interface: $INT"
@@ -50,10 +50,14 @@ ip -n physical link add wg0 type wireguard
 ip -n physical link set wg0 netns 1
 
 # Restore IP and route configuration for the default interface, start it
-ip -n physical addr add "$INT_IP" dev "$INT" brd "$INT_BRD"
+if [ -n "$INT_BRD" ]; then
+  ip -n physical addr add "$INT_IP" dev "$INT" brd "$INT_BRD"
+else
+  ip -n physical addr add "$INT_IP" dev "$INT"
+fi
 ip -n physical link set "$INT" up
 #ip -n physical link set lo up
-ip -n physical route add default via "$GW" dev "$INT"
+ip -n physical route add default via "$GW" dev "$INT" onlink
 
 #
 # Setting up Wireguard
