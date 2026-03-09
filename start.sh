@@ -93,6 +93,24 @@ ip -n physical addr add 10.10.13.37/31 dev veth2
 ip link set veth1 up
 ip -n physical link set veth2 up
 
+if [[ "${WEBPROXY_ENABLED,,}" == "true" ]]; then
+  WEBPROXY_PORT="${WEBPROXY_PORT:-8118}"
+  WEBPROXY_BIND_ADDRESS="${WEBPROXY_BIND_ADDRESS:-0.0.0.0}"
+
+  echo "Starting web proxy (Privoxy) on ${WEBPROXY_BIND_ADDRESS}:${WEBPROXY_PORT}"
+
+  # Remove all listen-address lines and add exactly one with the correct address/port
+  sed -i '/^listen-address /d' /etc/privoxy/config
+  echo "listen-address ${WEBPROXY_BIND_ADDRESS}:${WEBPROXY_PORT}" >> /etc/privoxy/config
+
+  # Start Privoxy in the current (wg0) namespace so traffic routes through WireGuard
+  privoxy /etc/privoxy/config
+
+  # Activate the stream module and proxy stream block via nginx include dirs
+  cp /opt/nginx/templates/stream_module.conf /opt/nginx/main.d/stream_module.conf
+  envsubst '${WEBPROXY_PORT}' < /opt/nginx/templates/stream.conf > /opt/nginx/stream.d/stream.conf
+fi
+
 # Start a reverse proxy in the physical namespace
 ip netns exec physical nginx -c /opt/nginx/server.conf
 

@@ -46,6 +46,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - WEBPROXY_ENABLED=true # only if you need the bundled proxy
       - CONFIG_FILE=/wg-config/my_wg.conf  # A config file within your wireguard config mount
     logging:
       driver: json-file
