@@ -27,7 +27,7 @@ COPY --from=transmissionui /opt/transmission-ui /opt/transmission-ui
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
-    dumb-init transmission-daemon \
+    dumb-init transmission-daemon python3 \
     tzdata dnsutils iputils-ping ufw iproute2 \
     openssh-client git jq curl wget unrar unzip bc \
     # New for this image
@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y \
 
 
 ADD start.sh /opt/wireguard/start.sh
+ADD get-config-value.py /opt/wireguard/get-config-value.py
 ADD nginx_server.conf /opt/nginx/server.conf
 ADD transmission-default-settings.json /opt/transmission/default-settings.json
 ADD updateSettings.py /opt/transmission/
@@ -56,4 +57,4 @@ ENV TRANSMISSION_HOME=/config/transmission-home \
 ARG REVISION
 ENV REVISION=${REVISION:-""}
 
-CMD ["dumb-init", "-vv", "/opt/wireguard/start.sh"]
+CMD ["dumb-init", "/opt/wireguard/start.sh"]

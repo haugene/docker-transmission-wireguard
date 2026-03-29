@@ -60,8 +60,10 @@ ip -n physical route add default via "$GW" dev "$INT"
 # We need to make the wg0 interface separately to do the namespace linking
 # and we can't use wg-quick after that. So the rest is done "manually".
 #
-address=$(grep "Address" "$CONFIG_FILE" | awk '{print $NF}' | cut -d, -f1)
-#dns=$(grep "DNS" "$config_file" | awk '{print $NF}')
+
+# Get the Address from the config file. For now: Only keep the first address (typically the IPv4 address)
+address=$(python3 /opt/wireguard/get-config-value.py Address "$CONFIG_FILE" | cut -d, -f1 | xargs)
+#dns=$(python3 /opt/wireguard/get-config-value.py DNS "$CONFIG_FILE")
 
 ip addr add "$address" dev wg0
 
