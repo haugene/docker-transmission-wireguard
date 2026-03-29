@@ -68,7 +68,7 @@ address=$(python3 /opt/wireguard/get-config-value.py Address "$CONFIG_FILE" | cu
 ip addr add "$address" dev wg0
 
 stripped_config_file=$(mktemp)
-wg-quick strip "$CONFIG_FILE" > "$stripped_config_file"
+python3 /opt/wireguard/strip-wg-config.py "$CONFIG_FILE" > "$stripped_config_file"
 
 echo "Will use wg config from $stripped_config_file"
 wg setconf wg0 "$stripped_config_file"
