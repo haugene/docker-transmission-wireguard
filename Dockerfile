@@ -7,7 +7,7 @@ RUN apk --no-cache add curl jq \
     && wget -qO- https://github.com/killemov/Shift/archive/master.tar.gz | tar xz -C /opt/transmission-ui \
     && mv /opt/transmission-ui/Shift-master /opt/transmission-ui/shift \
     && echo "Install Flood for Transmission" \
-    && wget -qO- https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.tar.gz | tar xz -C /opt/transmission-ui \
+    && wget -qO- https://github.com/johman10/flood-for-transmission/releases/latest/download/flood-for-transmission.tar.gz | tar xz -C /opt/transmission-ui \
     && echo "Install Combustion" \
     && wget -qO- https://github.com/Secretmapper/combustion/archive/release.tar.gz | tar xz -C /opt/transmission-ui \
     && echo "Install kettu" \
@@ -15,7 +15,11 @@ RUN apk --no-cache add curl jq \
     && mv /opt/transmission-ui/kettu-master /opt/transmission-ui/kettu \
     && echo "Install Transmissionic" \
     && wget -qO- https://github.com/6c65726f79/Transmissionic/releases/download/v1.8.0/Transmissionic-webui-v1.8.0.zip | unzip -q - \
-    && mv web /opt/transmission-ui/transmissionic
+    && mv web /opt/transmission-ui/transmissionic \
+    && echo "Install Transmission Web Control" \
+    && wget -qO- https://github.com/ronggang/transmission-web-control/archive/v1.6.1-update1.tar.gz | tar xz -C /opt/transmission-ui \
+    && mv /opt/transmission-ui/transmission-web-control-1.6.1-update1/src /opt/transmission-ui/transmission-web-control \
+    && rm -rf /opt/transmission-ui/transmission-web-control-1.6.1-update1
 
 # Main image
 FROM ubuntu:24.04

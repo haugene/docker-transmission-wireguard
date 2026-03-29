@@ -104,9 +104,10 @@ if [[ -n "$TRANSMISSION_WEB_UI" ]]; then
     flood-for-transmission) ui_dir="flood-for-transmission" ;;
     shift)             ui_dir="shift" ;;
     transmissionic)    ui_dir="transmissionic" ;;
+    transmission-web-control) ui_dir="transmission-web-control" ;;
     *)
       echo "ERROR: Unknown TRANSMISSION_WEB_UI value: $TRANSMISSION_WEB_UI"
-      echo "Valid options: combustion, kettu, flood-for-transmission, shift, transmissionic"
+      echo "Valid options: combustion, kettu, flood-for-transmission, shift, transmissionic, transmission-web-control"
       exit 1
       ;;
   esac
