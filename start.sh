@@ -43,7 +43,7 @@ cat /etc/resolv.conf
 # Create a "physical" network namespace and move our eth0 there
 ip netns ls
 ip netns add physical
-ip link set eth0 netns physical
+ip link set "$INT" netns physical
 
 # Create wireguard interface in physical namespace and move it to the default namespace
 ip -n physical link add wg0 type wireguard
