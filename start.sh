@@ -96,6 +96,25 @@ ip -n physical link set veth2 up
 # Start a reverse proxy in the physical namespace
 ip netns exec physical nginx -c /opt/nginx/server.conf
 
+# Set TRANSMISSION_WEB_HOME if user has selected an alternative web UI
+if [[ -n "$TRANSMISSION_WEB_UI" ]]; then
+  case "$TRANSMISSION_WEB_UI" in
+    combustion)        ui_dir="combustion-release" ;;
+    kettu)             ui_dir="kettu" ;;
+    flood-for-transmission) ui_dir="flood-for-transmission" ;;
+    shift)             ui_dir="shift" ;;
+    transmissionic)    ui_dir="transmissionic" ;;
+    *)
+      echo "ERROR: Unknown TRANSMISSION_WEB_UI value: $TRANSMISSION_WEB_UI"
+      echo "Valid options: combustion, kettu, flood-for-transmission, shift, transmissionic"
+      exit 1
+      ;;
+  esac
+
+  export TRANSMISSION_WEB_HOME="/opt/transmission-ui/${ui_dir}"
+  echo "Using alternative Transmission UI: $TRANSMISSION_WEB_UI (from $TRANSMISSION_WEB_HOME)"
+fi
+
 # Make sure TRANSMISSION_HOME exists and create/update settings.json
 mkdir -p "$TRANSMISSION_HOME"
 python3 /opt/transmission/updateSettings.py /opt/transmission/default-settings.json ${TRANSMISSION_HOME}/settings.json || exit 1
