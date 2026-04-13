@@ -21,6 +21,7 @@ fi
 GW=$(/sbin/ip route list match 0.0.0.0 | awk '{print $3}')
 INT=$(/sbin/ip route list match 0.0.0.0 | awk '{print $5}')
 INT_IP=$(ip -f inet addr show "$INT" | awk '/inet / {print $2}')
+# Broadcast may be absent (e.g. /32). Only pass brd when `ip addr` showed one, we want to mirror the original
 INT_BRD=$(ip -f inet addr show "$INT" | awk '/inet / {if ($3 == "brd") print $4}')
 
 echo "Found default container interface, will use this in setup:"
