@@ -58,7 +58,10 @@ else
 fi
 ip -n physical link set "$INT" up
 #ip -n physical link set lo up
-ip -n physical route add default via "$GW" dev "$INT" onlink
+if ! ip -n physical route add default via "$GW" dev "$INT"; then
+  echo "Default route via $GW was not accepted as on-link, retrying with onlink"
+  ip -n physical route add default via "$GW" dev "$INT" onlink
+fi
 
 #
 # Setting up Wireguard
