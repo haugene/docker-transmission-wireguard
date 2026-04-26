@@ -33,6 +33,8 @@ That way you'll map it to port 9092 locally and you can have them both running a
 ```yaml
 services:
   transmission-wireguard:
+    networks: 
+      - wg-trans_default
     # No versioned tags yet, pulling latest build from the main branch.
     image: haugene/transmission-wireguard:main
     container_name: wg-main
@@ -51,4 +53,8 @@ services:
       driver: json-file
       options:
         max-size: 10m
+networks:
+  wg-trans_default:
+    name: wg-trans_default
+    enable_ipv6: false
 ```
