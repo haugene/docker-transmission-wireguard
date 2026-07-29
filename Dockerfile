@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y \
 
 ADD start.sh /opt/wireguard/start.sh
 ADD get-config-value.py /opt/wireguard/get-config-value.py
+ADD resolve-wg-endpoints.py /opt/wireguard/resolve-wg-endpoints.py
 ADD strip-wg-config.py /opt/wireguard/strip-wg-config.py
 ADD nginx_server.conf /opt/nginx/server.conf
 ADD transmission-default-settings.json /opt/transmission/default-settings.json

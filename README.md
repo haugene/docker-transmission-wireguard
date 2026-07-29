@@ -52,3 +52,21 @@ services:
       options:
         max-size: 10m
 ```
+
+## DNS and WireGuard endpoints
+
+The container moves the Docker network interface into a separate network namespace so
+Transmission only has the WireGuard interface. That means hostname lookups for a
+WireGuard `Endpoint` cannot wait until after setup — there is no path to a resolver
+in that namespace until the tunnel is up.
+
+If your config uses a DNS name in `Endpoint` (instead of an IP), the container
+resolves it **once at startup** via `dig` to `WG_BOOTSTRAP_DNS` (default `1.1.1.1`),
+then rewrites the config to use that IP before moving the interface. That single
+bootstrap lookup goes outside the tunnel; later DNS (with the default override to
+Cloudflare) goes through WireGuard.
+
+| Variable | Purpose |
+| --- | --- |
+| `WG_BOOTSTRAP_DNS` | IP of the resolver used only for Endpoint hostname lookup (default `1.1.1.1`). Must be an IP, not a hostname. |
+| `ACCEPT_DNS_PRIVACY_LOSS=true` | Do not replace `/etc/resolv.conf`. Docker's embedded resolver (`127.0.0.11`) may then answer DNS outside the tunnel. Prefer leaving this unset. |

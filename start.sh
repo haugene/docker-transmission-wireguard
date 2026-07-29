@@ -30,12 +30,19 @@ echo "Gateway: $GW"
 echo "Interface address: $INT_IP"
 echo "Interface broadcast: $INT_BRD"
 
-# Override DNS to Cloudflare unless SKIP_DNS_OVERRIDE is set to true (case insensitive)
-if [ -z "${SKIP_DNS_OVERRIDE}" ] || ! [[ "${SKIP_DNS_OVERRIDE,,}" == "true" ]]; then
+# Resolve WireGuard Endpoint hostnames to IPs while eth0 is still in this namespace
+# (uses dig @WG_BOOTSTRAP_DNS, default 1.1.1.1 — not Docker's 127.0.0.11).
+RESOLVED_CONFIG="$(mktemp)"
+trap 'rm -f "$RESOLVED_CONFIG"' EXIT
+python3 /opt/wireguard/resolve-wg-endpoints.py "$CONFIG_FILE" "$RESOLVED_CONFIG"
+
+# Override DNS to Cloudflare unless ACCEPT_DNS_PRIVACY_LOSS is set to true (case insensitive).
+# If set, Docker's resolver (often 127.0.0.11) may bypass the WireGuard tunnel for DNS.
+if [ -z "${ACCEPT_DNS_PRIVACY_LOSS}" ] || ! [[ "${ACCEPT_DNS_PRIVACY_LOSS,,}" == "true" ]]; then
   echo "Overriding DNS to Cloudflare"
   echo "nameserver 1.1.1.1" > /etc/resolv.conf
 else
-  echo "Skipping DNS override due to SKIP_DNS_OVERRIDE=${SKIP_DNS_OVERRIDE}"
+  echo "ACCEPT_DNS_PRIVACY_LOSS=true: not overriding /etc/resolv.conf; DNS queries may not use the WireGuard tunnel."
 fi
 
 echo "DNS config:"
@@ -70,13 +77,13 @@ fi
 #
 
 # Get the Address from the config file. For now: Only keep the first address (typically the IPv4 address)
-address=$(python3 /opt/wireguard/get-config-value.py Address "$CONFIG_FILE" | cut -d, -f1 | xargs)
-#dns=$(python3 /opt/wireguard/get-config-value.py DNS "$CONFIG_FILE")
+address=$(python3 /opt/wireguard/get-config-value.py Address "$RESOLVED_CONFIG" | cut -d, -f1 | xargs)
+#dns=$(python3 /opt/wireguard/get-config-value.py DNS "$RESOLVED_CONFIG")
 
 ip addr add "$address" dev wg0
 
 stripped_config_file=$(mktemp)
-python3 /opt/wireguard/strip-wg-config.py "$CONFIG_FILE" > "$stripped_config_file"
+python3 /opt/wireguard/strip-wg-config.py "$RESOLVED_CONFIG" > "$stripped_config_file"
 
 echo "Will use wg config from $stripped_config_file"
 wg setconf wg0 "$stripped_config_file"
