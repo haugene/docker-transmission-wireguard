@@ -21,8 +21,10 @@ RUN apk --no-cache add curl jq \
     && mv /opt/transmission-ui/transmission-web-control-1.6.1-update1/src /opt/transmission-ui/transmission-web-control \
     && rm -rf /opt/transmission-ui/transmission-web-control-1.6.1-update1
 
-# Main image
-FROM ubuntu:24.04
+# Main image — Ubuntu + Transmission from the shared base
+# https://github.com/haugene/transmission-base
+# Dev-channel tag until main publishes 4.1.3-ubuntu26.04
+FROM haugene/transmission-base:4.1.3-ubuntu26.04-dev
 
 VOLUME /data
 VOLUME /config
@@ -31,12 +33,10 @@ COPY --from=transmissionui /opt/transmission-ui /opt/transmission-ui
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
-    dumb-init transmission-daemon python3 \
+    dumb-init python3 \
     tzdata dnsutils iputils-ping ufw iproute2 \
     openssh-client git jq curl wget unrar unzip bc \
-    # New for this image
     wireguard nginx \
-    # End new for this image
     && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && useradd -u 911 -U -d /config -s /bin/false abc \
     && usermod -G users abc
