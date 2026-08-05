@@ -46,7 +46,6 @@ ADD get-config-value.py /opt/wireguard/get-config-value.py
 ADD resolve-wg-endpoints.py /opt/wireguard/resolve-wg-endpoints.py
 ADD strip-wg-config.py /opt/wireguard/strip-wg-config.py
 ADD nginx_server.conf /opt/nginx/server.conf
-ADD transmission-default-settings.json /opt/transmission/default-settings.json
 ADD updateSettings.py /opt/transmission/
 ADD userSetup.sh /opt/transmission/
 
@@ -54,9 +53,11 @@ ADD userSetup.sh /opt/transmission/
 ENV TRANSMISSION_HOME=/config/transmission-home \
     TRANSMISSION_DOWNLOAD_DIR=/data/completed \
     TRANSMISSION_INCOMPLETE_DIR=/data/incomplete \
+    TRANSMISSION_INCOMPLETE_DIR_ENABLED=true \
     TRANSMISSION_WATCH_DIR=/data/watch \
+    TRANSMISSION_WATCH_DIR_ENABLED=true \
     GLOBAL_APPLY_PERMISSIONS=true \
-    TRANSMISSION_UMASK=2
+    TRANSMISSION_UMASK=002
 
 # Get base_revision passed as a build argument and set it as env var
 ARG REVISION

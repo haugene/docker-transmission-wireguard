@@ -20,10 +20,10 @@ But from the "getting it to run" perspective, the first things that come to mind
 
 This might change, but this is how it's running now.
 
-I've also changed the Transmission settings handling a bit. The container will still accept
-environment variables, but defaults are read from a file. This is to de-clutter the Dockerfile a bit.
-There are still a handful of default settings being set as ENV variables in the Dockerfile to
-get the PUID/PGID working like it used to. I'll try to clean up that as well.
+Transmission settings are overridden via `TRANSMISSION_*` environment variables
+(for example `TRANSMISSION_PEER_PORT`). On first run those are written into a new
+`settings.json`; on later starts they overlay the existing file. A few path/umask
+defaults are set as `ENV` in the Dockerfile for PUID/PGID layouts.
 
 If you're already running the old image, I'd recommend setting the ports option to: `- 9092:9091`.
 That way you'll map it to port 9092 locally and you can have them both running at the same time.

@@ -46,15 +46,22 @@ if [ -n "$PUID" ] && [ ! "$(id -u root)" -eq "$PUID" ]; then
         echo "Setting permissions for download and incomplete directories"
         
         if [ -z "$TRANSMISSION_UMASK" ] ; then
-            # fetch from settings.json if not defined in environment
-            # because updateSettings.py is called after this script is run
-            TRANSMISSION_UMASK=$(jq .umask ${TRANSMISSION_HOME}/settings.json)
+            # Prefer settings.json when unset (updateSettings.py runs before this)
+            TRANSMISSION_UMASK=$(jq -r .umask "${TRANSMISSION_HOME}/settings.json")
         fi
 
-        TRANSMISSION_UMASK_OCTAL=$( printf "%o\n" "${TRANSMISSION_UMASK}" )
+        # Transmission 4.1+ stores umask as an octal string (e.g. "002"); older
+        # values may still be a decimal integer (2).
+        if [[ "$TRANSMISSION_UMASK" =~ ^0[0-7]*$ ]]; then
+            TRANSMISSION_UMASK_OCTAL=$(printf '%03o\n' "$((8#$TRANSMISSION_UMASK))")
+            TRANSMISSION_UMASK_DEC=$((8#$TRANSMISSION_UMASK))
+        else
+            TRANSMISSION_UMASK_OCTAL=$(printf '%03o\n' "${TRANSMISSION_UMASK}")
+            TRANSMISSION_UMASK_DEC=$((TRANSMISSION_UMASK))
+        fi
 
-        DIR_PERMS=$( printf '%o\n' $(( 8#777 & ~TRANSMISSION_UMASK)) )
-        FILE_PERMS=$( printf '%o\n' $(( 8#666 & ~TRANSMISSION_UMASK)) )
+        DIR_PERMS=$( printf '%o\n' $(( 8#777 & ~TRANSMISSION_UMASK_DEC)) )
+        FILE_PERMS=$( printf '%o\n' $(( 8#666 & ~TRANSMISSION_UMASK_DEC)) )
         
         echo "umask: ${TRANSMISSION_UMASK_OCTAL}"
         echo "Directories: ${DIR_PERMS}"
