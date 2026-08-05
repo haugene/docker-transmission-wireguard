@@ -133,7 +133,7 @@ fi
 
 # Make sure TRANSMISSION_HOME exists and create/update settings.json
 mkdir -p "$TRANSMISSION_HOME"
-python3 /opt/transmission/updateSettings.py /opt/transmission/default-settings.json ${TRANSMISSION_HOME}/settings.json || exit 1
+python3 /opt/transmission/updateSettings.py ${TRANSMISSION_HOME}/settings.json || exit 1
 
 # Support running Transmission as non-root (and set permissions on folders)
 . /opt/transmission/userSetup.sh
